@@ -1,0 +1,5 @@
+﻿model,mpra-u,mpra-h,mpra-v random,mprav-human
+optimusN,0.933,0.79,0.837,0.778
+Framepooling,0.929,0.778,0.835,0.799
+Mixing,0.936,0.752,0.894,0.841
+MTtrans,0.947,0.832,0.905,0.844

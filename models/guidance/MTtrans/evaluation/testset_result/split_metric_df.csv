@@ -1,0 +1,25 @@
+,Pearson's R of Framepool predictions with observed values,Pearson's R of Optimus predictions with observed values,Spearman's rho of Framepool predictions with observed values,Spearman's rho of Optimus predictions with observed values,data,data_type,significant_diff_Pearson,significant_diff_Spearman,split_type,train_data_type
+0,0.026242362978010494,0.025568450958374764,0.0230357167389206,0.020869994552580644,Floor,Trip-seq,Not Significant,Not Significant,Human 5'UTR shorter than longest training sequence,Trained on 50 nt MPRA
+1,0.18926891701665394,0.14247342454549317,0.19298443441902932,0.10502803549797238,Andreev,Ribo-seq,Not Significant,Not Significant,Human 5'UTR shorter than longest training sequence,Trained on 50 nt MPRA
+2,0.20523526731974792,0.14910735453706025,0.2195997737341921,0.11976848552471943,Xiao,Ribo-seq,Not Significant,Significant,Human 5'UTR shorter than longest training sequence,Trained on 50 nt MPRA
+3,0.1271857338277114,0.11307512410365252,0.10750322179957536,0.06385286808722851,Eichhorn,Ribo-seq,Not Significant,Not Significant,Human 5'UTR shorter than longest training sequence,Trained on 50 nt MPRA
+4,0.12370856039553993,0.08901756274042219,0.11673080554681166,0.02625262768985228,Eraslan,PTR,Not Significant,Significant,Human 5'UTR shorter than longest training sequence,Trained on 50 nt MPRA
+5,0.04796194827358018,-0.002811577178107841,0.04970651393275374,-0.024884841903461973,Wilhelm,PTR,Not Significant,Not Significant,Human 5'UTR shorter than longest training sequence,Trained on 50 nt MPRA
+6,0.1443636516742277,0.06948175071247494,0.15232282949769332,0.05991356507151016,Floor,Trip-seq,Significant,Significant,Human 5'UTR longer than longest training sequence,Trained on 50 nt MPRA
+7,0.22184205177988436,0.15564595254618765,0.22490562968835184,0.1387534468049937,Andreev,Ribo-seq,Significant,Significant,Human 5'UTR longer than longest training sequence,Trained on 50 nt MPRA
+8,0.2608314766992708,0.22773287959407984,0.2677910990764284,0.22099081612355242,Xiao,Ribo-seq,Not Significant,Significant,Human 5'UTR longer than longest training sequence,Trained on 50 nt MPRA
+9,0.20923453860623586,0.08116944626015977,0.21290020192611359,0.05448068094204648,Eichhorn,Ribo-seq,Significant,Significant,Human 5'UTR longer than longest training sequence,Trained on 50 nt MPRA
+10,0.1479241891295333,0.1031762685492797,0.15774523888382289,0.08210676072450604,Eraslan,PTR,Significant,Significant,Human 5'UTR longer than longest training sequence,Trained on 50 nt MPRA
+11,0.1278408404610356,0.09441453122924875,0.12400840294462223,0.08070618146064643,Wilhelm,PTR,Not Significant,Not Significant,Human 5'UTR longer than longest training sequence,Trained on 50 nt MPRA
+12,0.06567395073357704,0.07133188781409036,0.06183658872461312,0.06756661036199395,Floor,Trip-seq,Not Significant,Not Significant,Human 5'UTR shorter than longest training sequence,Trained on 25-100 nt MPRA
+13,0.15543821065650487,0.16210367934525519,0.19038283390487482,0.18669655172271601,Andreev,Ribo-seq,Not Significant,Not Significant,Human 5'UTR shorter than longest training sequence,Trained on 25-100 nt MPRA
+14,0.17331254200148344,0.19779130463509387,0.22883697378671178,0.2375829372021698,Xiao,Ribo-seq,Not Significant,Not Significant,Human 5'UTR shorter than longest training sequence,Trained on 25-100 nt MPRA
+15,0.1388306366617051,0.11654932171981977,0.11331352051709992,0.1045736650525518,Eichhorn,Ribo-seq,Not Significant,Not Significant,Human 5'UTR shorter than longest training sequence,Trained on 25-100 nt MPRA
+16,0.12667503038104022,0.1263947906801672,0.1251491786308485,0.1162627810965687,Eraslan,PTR,Not Significant,Not Significant,Human 5'UTR shorter than longest training sequence,Trained on 25-100 nt MPRA
+17,0.0885193999116646,0.07696571679273108,0.10633104947046282,0.08056175836051709,Wilhelm,PTR,Not Significant,Not Significant,Human 5'UTR shorter than longest training sequence,Trained on 25-100 nt MPRA
+18,0.18575365645446615,0.11871067834128451,0.18873741533584243,0.11191994065833097,Floor,Trip-seq,Significant,Significant,Human 5'UTR longer than longest training sequence,Trained on 25-100 nt MPRA
+19,0.2240731512916573,0.2026337207510545,0.23019850711139933,0.19826129480428079,Andreev,Ribo-seq,Not Significant,Not Significant,Human 5'UTR longer than longest training sequence,Trained on 25-100 nt MPRA
+20,0.19155573210246366,0.2292186468890327,0.20686423911048224,0.24113948018036882,Xiao,Ribo-seq,Not Significant,Not Significant,Human 5'UTR longer than longest training sequence,Trained on 25-100 nt MPRA
+21,0.2592764545488355,0.18870967585970866,0.2590224392652486,0.1635432773861884,Eichhorn,Ribo-seq,Significant,Significant,Human 5'UTR longer than longest training sequence,Trained on 25-100 nt MPRA
+22,0.17879014434903298,0.18612423567298725,0.18671377668928987,0.17440124052388997,Eraslan,PTR,Not Significant,Not Significant,Human 5'UTR longer than longest training sequence,Trained on 25-100 nt MPRA
+23,0.11735827776786519,0.1220460487513842,0.1270886640889036,0.12686315427583802,Wilhelm,PTR,Not Significant,Not Significant,Human 5'UTR longer than longest training sequence,Trained on 25-100 nt MPRA
