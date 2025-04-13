@@ -53,16 +53,22 @@ mkdir -p checkpoints
 mkdir -p configs
 
 # Download model weights
-wget https://zenodo.org/records/15192633/files/checkpoints.zip?download=1
-wget https://zenodo.org/records/15192633/files/configs.zip?download=1
+wget https://zenodo.org/records/15203813/files/checkpoints.zip?download=1
+wget https://zenodo.org/records/15203813/files/configs.zip?download=1
+wget https://zenodo.org/records/15203813/files/progen2-base.zip?download=1
+wget https://zenodo.org/records/15203813/files/progen2-small.zip?download=1
 
 # Extract model weights
 unzip checkpoints.zip -d checkpoints/
 unzip configs.zip -d confiigs/
+unzip progen2-base.zip -d models/autoencoder/decoder/checkpoints/progen2-base/
+unzip progen2-small.zip -d models/autoencoder/decoder/checkpoints/progen2-small/
 
 # Clean up
-rm checkpoints.zip
-rm configs.zip
+rm -f checkpoints.zip
+rm -f configs.zip
+rm -f progen2-base.zip
+rm -f progen2-small.zip
 ```
 
 ## 📊 Inference Pipeline
