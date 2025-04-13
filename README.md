@@ -1,6 +1,6 @@
 # RNAGenesis: Foundation Model for Enhanced RNA Sequence Generation and Structural Insights
 
-<div align=center><img src="./assets/RNAGenesis.png" width="700"/></div>
+<div align=center><img src="./assets/RNAGenesis.png" width="750"/></div>
 
 <div align=center>
 
