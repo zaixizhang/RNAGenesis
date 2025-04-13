@@ -22,7 +22,7 @@ RNAGenesis is a foundation model that combines RNA sequence understanding and de
 
 ### CRISPR sgRNA Design and Wet-lab Validation
 <div align=center>
-<img src="./assets/sgRNA_design.png" width="700"/>
+<img src="./assets/sgRNA_design.png" width="800"/>
 </div>
 
 ## 🛠️ Installation
