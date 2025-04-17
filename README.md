@@ -1,4 +1,4 @@
-# RNAGenesis: Foundation Model for Enhanced RNA Sequence Generation and Structural Insights
+# RNAGenesis: A Foundation Model for Enhanced RNA Sequence Generation and Structural Discovery
 
 <div align=center><img src="./assets/RNAGenesis.png" width="750"/></div>
 
