@@ -1,4 +1,4 @@
-# RNAGenesis: A Foundation Model for Enhanced RNA Sequence Generation and Structural Discovery
+# RNAGenesis: A Generalist Foundation Model for Functional RNA Therapeutics
 
 <div align=center><img src="./asset/RNAGenesis.png" width="750"/></div>
 
