@@ -11,12 +11,21 @@
 
 ## 🚀 Overview
 
-RNAGenesis is a foundation model that combines RNA sequence understanding and de novo design through latent diffusion. Key features include:
+**RNAGenesis** is a compact yet powerful RNA foundation model that unifies sequence understanding, *de novo* RNA design, and 3D structure prediction through a latent diffusion framework.
 
-- Pioneers test-time directed generation optimization in RNA foundation models with tree search and model-guidance strategies
-- Achieves state-of-the-art performance in RNA sequence understanding, leading in 9 of 13 benchmarks
-- Generates diverse non-coding RNA sequences, including natural-like aptamers and optimized CRISPR sgRNAs
-- Demonstrates superior gene knockout capabilities in wet-lab experiments compared to wildtype sgRNAs
+### 🔑 Key Features
+
+- 📌 **Inference-time optimization**  
+  Introduces test-time directed generation strategies—combining tree search and gradient-based model guidance—to steer RNA design toward desired structure and function.
+
+- 📊 **State-of-the-art performance**  
+  Achieves top results in 11 of 13 tasks on the BEACON benchmark for RNA sequence understanding.
+
+- 🧬 **Versatile RNA generation**  
+  Synthesizes diverse non-coding RNAs, including natural-like aptamers and structurally optimized CRISPR sgRNAs.
+
+- 🧪 **Experimental validation**  
+  RNAGenesis-designed sgRNAs outperform wild-type scaffolds in gene knockout efficiency, with up to 2× improvement across CRISPR-Cas9, base editing, and prime editing platforms.
 
 ## 📊 Results
 
