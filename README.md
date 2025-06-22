@@ -1,6 +1,6 @@
 # RNAGenesis: A Foundation Model for Enhanced RNA Sequence Generation and Structural Discovery
 
-<div align=center><img src="./assets/RNAGenesis.png" width="750"/></div>
+<div align=center><img src="./asset/RNAGenesis.png" width="750"/></div>
 
 <div align=center>
 
@@ -22,7 +22,7 @@ RNAGenesis is a foundation model that combines RNA sequence understanding and de
 
 ### CRISPR sgRNA Design and Wet-lab Validation
 <div align=center>
-<img src="./assets/sgRNA_design.png" width="800"/>
+<img src="./asset/sgRNA_design.png" width="800"/>
 </div>
 
 ## 🛠️ Installation
