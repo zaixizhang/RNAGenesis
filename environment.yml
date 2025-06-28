@@ -1,6 +1,7 @@
 name: rnagenesis
 channels:
   - conda-forge
+  - bioconda
 dependencies:
   - python=3.8.13
   - pip=21.2.4
@@ -18,6 +19,7 @@ dependencies:
   - ca-certificates=2021.10.8
   - setuptools=59.5.0
   - wheel=0.37.1
+  - viennarna  # added from bioconda
   - pip:
       - torch==2.1.2
       - torchvision==0.16.2
@@ -34,3 +36,4 @@ dependencies:
       - torchmetrics==1.2.1
       - xgboost==1.5.2
       - omegaconf==2.3.0
+      - rna-fm 
