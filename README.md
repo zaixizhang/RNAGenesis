@@ -4,7 +4,7 @@
 
 <div align=center>
 
-[![Paper](https://img.shields.io/badge/📄-Paper-green)](https://www.biorxiv.org/content/10.1101/2024.12.30.630826v1)
+[![Paper](https://img.shields.io/badge/📄-Paper-green)](https://www.biorxiv.org/content/10.1101/2024.12.30.630826v2)
 [![Twitter](https://img.shields.io/badge/𝕏-Twitter-black)](https://x.com/BiologyAIDaily/status/1874420780341338129)
 
 </div>
