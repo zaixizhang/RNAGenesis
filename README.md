@@ -53,6 +53,8 @@ conda activate rnagenesis
 pip install torch==2.1.2 torchvision==0.16.2 torchaudio==2.1.2
 pip install transformers==4.32.1 diffusers==0.25.0 accelerate==0.25.0 logomaker==0.8 biopython==1.83 sentencepiece==0.1.99 huggingface-hub==0.28.1 wandb==0.19.6 pytorch-lightning==2.1.3 torchmetrics==1.2.1 xgboost==1.5.2 omegaconf==2.3.0
 conda install numpy=1.22.0 pandas=1.3.1 scipy=1.10.1 matplotlib=3.7.1 seaborn=0.13.2 scikit-learn=0.24.0 jupyterlab=2.3.2 ipython=8.3.0 ipykernel=6.13.0 openssl=1.1.1o zlib=1.2.11 ca-certificates=2021.10.8 setuptools=59.5.0 wheel=0.37.1
+pip install rna-fm
+conda install -c bioconda viennarna
 ```
 
 ## 📥 Download and Extract Model Weights
