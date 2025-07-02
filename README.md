@@ -160,6 +160,15 @@ rm -f progen2-small.zip
      --mid_folder "BS_sgRNA"
    ```
 
+It takes around 5 hours to generate all the sequences on 1 A100 GPU. 
+
+### Examples of Generated Scaffolds by RNAGenesis Aligned with Wildtype
+
+<div align=center>
+<img src="./asset/sequence_alignment.png" width="800"/>
+</div>
+
+
 ## 📝 Citation
 
 If you find this work helpful, please cite our paper:
