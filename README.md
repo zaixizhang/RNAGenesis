@@ -162,6 +162,11 @@ rm -f progen2-small.zip
 
 It takes around 5 hours to generate all the sequences on 1 A100 GPU. 
 
+## 🔍 Encoder Checkpoint for Embeddings  
+
+We also release the **RNAGenesis encoder checkpoint** on [Hugging Face](https://huggingface.co/Zaixi/RNAGenesis), enabling direct extraction of **RNA embeddings** for downstream applications such as sequence classification, clustering, and functional annotation. This allows researchers to leverage RNAGenesis not only for generation but also as a **universal RNA representation model** that can be integrated into diverse pipelines.  
+
+
 ### Examples of Generated Scaffolds by RNAGenesis Aligned with Wildtype
 
 <div align=center>
