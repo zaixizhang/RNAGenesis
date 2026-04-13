@@ -167,6 +167,10 @@ It takes around 5 hours to generate all the sequences on 1 A100 GPU.
 We also release the **RNAGenesis encoder checkpoint** on [Hugging Face](https://huggingface.co/Zaixi/RNAGenesis), enabling direct extraction of **RNA embeddings** for downstream applications such as sequence classification, clustering, and functional annotation. This allows researchers to leverage RNAGenesis not only for generation but also as a **universal RNA representation model** that can be integrated into diverse pipelines.  
 
 
+## 🧬 RNA Tertiary Structure Prediction
+
+RNAGenesis can be fine-tuned for RNA 3D structure prediction. The [`struct_pred/`](./struct_pred/) module fine-tunes the RNAGenesis encoder with an Evoformer-style trunk to predict inter-residue distance distributions and contact probabilities, which are then folded into 3D atomic models via PyRosetta energy minimisation. See [`struct_pred/README.md`](./struct_pred/README.md) for training, inference, and evaluation instructions.
+
 ### Examples of Generated Scaffolds by RNAGenesis Aligned with Wildtype
 
 <div align=center>
@@ -192,6 +196,7 @@ If you find this work helpful, please cite our paper:
 ## 🙏 Acknowledgments
 
 We thank the following open-source projects for their valuable contributions:
+- [structRFM](https://github.com/luo-group/structRFM)
 - [RNAcentral](https://rnacentral.org/)
 - [ViennaRNA](https://www.tbi.univie.ac.at/RNA/)
 - [RNAfold](https://github.com/ViennaRNA/ViennaRNA)
