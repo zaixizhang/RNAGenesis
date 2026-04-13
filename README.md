@@ -161,6 +161,11 @@ rm -f progen2-small.zip
    ```
 
 It takes around 5 hours to generate all the sequences on 1 A100 GPU. 
+### Examples of Generated Scaffolds by RNAGenesis Aligned with Wildtype
+
+<div align=center>
+<img src="./asset/sequence_alignment.png" width="800"/>
+</div>
 
 ## 🔍 Encoder Checkpoint for Embeddings  
 
@@ -171,11 +176,7 @@ We also release the **RNAGenesis encoder checkpoint** on [Hugging Face](https://
 
 RNAGenesis can be fine-tuned for RNA 3D structure prediction. The [`struct_pred/`](./struct_pred/) module fine-tunes the RNAGenesis encoder with an Evoformer-style trunk to predict inter-residue distance distributions and contact probabilities, which are then folded into 3D atomic models via PyRosetta energy minimisation. See [`struct_pred/README.md`](./struct_pred/README.md) for training, inference, and evaluation instructions.
 
-### Examples of Generated Scaffolds by RNAGenesis Aligned with Wildtype
 
-<div align=center>
-<img src="./asset/sequence_alignment.png" width="800"/>
-</div>
 
 
 ## 📝 Citation
@@ -196,12 +197,12 @@ If you find this work helpful, please cite our paper:
 ## 🙏 Acknowledgments
 
 We thank the following open-source projects for their valuable contributions:
-- [structRFM](https://github.com/luo-group/structRFM)
 - [RNAcentral](https://rnacentral.org/)
 - [ViennaRNA](https://www.tbi.univie.ac.at/RNA/)
 - [RNAfold](https://github.com/ViennaRNA/ViennaRNA)
 - [RNApdbee 2.0](http://rnapdbee.cs.put.poznan.pl/)
 - [3DNADSSR](https://x3dna.org/)
+- [structRFM](https://github.com/luo-group/structRFM)
 - [AlphaFold3](https://github.com/google-deepmind/alphafold)
 
 ## 📄 License
