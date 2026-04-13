@@ -1,0 +1,9 @@
+torch>=2.0.0
+transformers>=4.41.0
+einops>=0.7.0
+numpy>=1.24.0
+scipy>=1.10.0
+biopython>=1.81
+tqdm>=4.65.0
+# For 3-D structure generation (fold.py):
+# pyrosetta  — install from https://www.pyrosetta.org/
