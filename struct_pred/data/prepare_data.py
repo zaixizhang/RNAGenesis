@@ -1,208 +1,158 @@
 from __future__ import annotations
 """
-Download and curate the tertiary structure training / evaluation dataset.
+Download and prepare the RNA tertiary structure dataset.
 
-The source data (NPZ files with MSA, secondary structure, and inter-residue
-geometry labels) is hosted on Zenodo.  This script:
-  1. Downloads the Zenodo archive.
-  2. Extracts the relevant task split.
-  3. Verifies file integrity.
-  4. Writes train / val / test list files.
+The curated dataset (rnagenesis_struct_pred_data.zip, ~2.4 GB) is hosted on
+Google Drive:
+  https://drive.google.com/drive/folders/1R5lLvKCWWrAcLHVQjV8lT4hmkXJa1xhO
 
-Zenodo DOI: 10.5281/zenodo.16754363
+Contents after extraction:
+  train/npz/        3,633 NPZ files  (MSA + SS + inter-residue geometry labels)
+  train/train.lst   3,452 training entry IDs
+  train/val.lst       181 validation entry IDs
+  train/npz.lst     full entry list
+  train/BPfold_SS.csv  secondary structure predictions
+  test/20_RNA_Puzzles/ 20 RNA Puzzle structures (MSA + native PDB + SS)
+  test/CASP15_RNAs/    12 CASP15 RNA targets  (MSA + SS + PDB reference)
+
+Each NPZ file contains:
+  aln        (N, L)  integer MSA  (A=0, U=1, C=2, G=3, gap=4)
+  ss         (L, L)  secondary structure contact matrix
+  P, C3', C1', C4, N1, CiNj, PiNj  (L, L)  inter-residue distances (Å)
+  contact    (L, L)  all-atom contact matrix (< 8 Å)
+
+Usage:
+    pip install gdown
+    python data/prepare_data.py /path/to/output_dir
 """
 
 import argparse
-import hashlib
 import json
 import os
-import shutil
-import subprocess
 import zipfile
 
-ZENODO_DOI = "10.5281/zenodo.16754363"
-ZENODO_BASE_URL = "https://zenodo.org/api/records"
-
-# Sub-archive name inside the Zenodo deposit that holds the tertiary structure task data
-TERTIARY_ARCHIVE_NAME = "TSP_data.zip"
+GDRIVE_FOLDER_ID = "1R5lLvKCWWrAcLHVQjV8lT4hmkXJa1xhO"
+GDRIVE_FOLDER_URL = f"https://drive.google.com/drive/folders/{GDRIVE_FOLDER_ID}"
+ARCHIVE_NAME = "rnagenesis_struct_pred_data.zip"
 
 
 # ---------------------------------------------------------------------------
-# Download helpers
+# Download
 # ---------------------------------------------------------------------------
 
-def _resolve_zenodo_files(doi: str) -> list[dict]:
-    """Query the Zenodo REST API and return the list of file records."""
-    import urllib.request
-    import json as _json
-
-    record_id = doi.split(".")[-1]
-    url = f"{ZENODO_BASE_URL}/{record_id}"
-    with urllib.request.urlopen(url) as resp:
-        data = _json.loads(resp.read())
-    return data["files"]
-
-
-def _download_file(url: str, dest: str, chunk_size: int = 1 << 20) -> None:
-    """Stream-download a URL to *dest* with a progress indicator."""
-    import urllib.request
-
-    os.makedirs(os.path.dirname(dest) or ".", exist_ok=True)
-    with urllib.request.urlopen(url) as resp, open(dest, "wb") as fh:
-        total = int(resp.headers.get("Content-Length", 0))
-        downloaded = 0
-        while True:
-            chunk = resp.read(chunk_size)
-            if not chunk:
-                break
-            fh.write(chunk)
-            downloaded += len(chunk)
-            if total:
-                pct = 100 * downloaded / total
-                print(f"\r  {pct:.1f}%  ({downloaded >> 20} / {total >> 20} MB)", end="", flush=True)
-    print()
-
-
-def _md5(path: str) -> str:
-    h = hashlib.md5()
-    with open(path, "rb") as fh:
-        for chunk in iter(lambda: fh.read(1 << 20), b""):
-            h.update(chunk)
-    return h.hexdigest()
-
-
-# ---------------------------------------------------------------------------
-# Main workflow
-# ---------------------------------------------------------------------------
-
-def download_dataset(out_dir: str, force: bool = False) -> str:
-    """
-    Download the Zenodo archive to *out_dir* and return the local path.
-
-    Args:
-        out_dir: Destination directory.
-        force:   Re-download even if the file already exists.
-
-    Returns:
-        Path to the downloaded archive.
-    """
-    print(f"Resolving Zenodo deposit: {ZENODO_DOI}")
-    files = _resolve_zenodo_files(ZENODO_DOI)
-
-    target = next(
-        (f for f in files if f["key"] == TERTIARY_ARCHIVE_NAME), None
-    )
-    if target is None:
-        # Fall back: take the first zip that looks like task data
-        target = next(
-            (f for f in files if "TSP" in f["key"] or "tertiary" in f["key"].lower()),
-            files[0],
+def _download_with_gdown(out_dir: str) -> str:
+    """Download the zip archive from Google Drive using gdown."""
+    try:
+        import gdown
+    except ImportError:
+        raise ImportError(
+            "gdown is required to download from Google Drive.\n"
+            "Install it with:  pip install gdown"
         )
-        print(f"[Warning] {TERTIARY_ARCHIVE_NAME!r} not found; using {target['key']!r}")
 
-    dest = os.path.join(out_dir, target["key"])
-    if os.path.isfile(dest) and not force:
-        print(f"Archive already exists: {dest}")
+    dest = os.path.join(out_dir, ARCHIVE_NAME)
+    if os.path.isfile(dest):
+        print(f"Archive already present: {dest}")
         return dest
 
-    print(f"Downloading {target['key']}  ({target['size'] >> 20} MB) ...")
-    _download_file(target["links"]["self"], dest)
+    print(f"Downloading dataset from Google Drive folder ...")
+    print(f"  {GDRIVE_FOLDER_URL}")
 
-    expected_md5 = target.get("checksum", "").replace("md5:", "")
-    if expected_md5:
-        actual_md5 = _md5(dest)
-        if actual_md5 != expected_md5:
-            raise RuntimeError(
-                f"MD5 mismatch for {dest}:\n  expected {expected_md5}\n  got      {actual_md5}"
-            )
-        print("  MD5 verified ✓")
-    return dest
+    # Download all files in the folder; the folder contains only the zip.
+    downloaded = gdown.download_folder(
+        id=GDRIVE_FOLDER_ID,
+        output=out_dir,
+        quiet=False,
+        use_cookies=False,
+    )
+
+    # gdown returns list of downloaded paths; find our zip
+    if downloaded:
+        for path in downloaded:
+            if path.endswith(".zip"):
+                if path != dest:
+                    os.rename(path, dest)
+                return dest
+
+    # Fallback: look for any zip in out_dir
+    for fname in os.listdir(out_dir):
+        if fname.endswith(".zip"):
+            found = os.path.join(out_dir, fname)
+            if found != dest:
+                os.rename(found, dest)
+            return dest
+
+    raise RuntimeError(
+        f"Download completed but {ARCHIVE_NAME} was not found in {out_dir}.\n"
+        f"Try downloading manually from:\n  {GDRIVE_FOLDER_URL}\n"
+        f"and place the zip in {out_dir}."
+    )
 
 
-def extract_and_curate(archive_path: str, out_dir: str) -> str:
-    """
-    Extract the downloaded archive and return the path to the NPZ directory.
+# ---------------------------------------------------------------------------
+# Extract
+# ---------------------------------------------------------------------------
 
-    The Zenodo deposit organises tertiary structure data under a folder named
-    'TSP' (Tertiary Structure Prediction).  After extraction we expect:
-        out_dir/
-          npz/        — per-entry .npz files (MSA + SS + geometry labels)
-          train.lst   — list of training entry IDs
-          val.lst     — list of validation entry IDs
-          test.lst    — list of test entry IDs
-
-    Args:
-        archive_path: Path to the downloaded zip archive.
-        out_dir:      Root output directory.
-
-    Returns:
-        Path to the directory containing the NPZ files.
-    """
-    print(f"Extracting {archive_path} ...")
+def extract(archive_path: str, out_dir: str) -> str:
+    """Extract the zip archive and return the path to the data root."""
+    print(f"Extracting {os.path.basename(archive_path)} ...")
     with zipfile.ZipFile(archive_path, "r") as zf:
         zf.extractall(out_dir)
-    print("  Extraction complete.")
 
-    # Locate the NPZ sub-directory
-    npz_dir = None
-    for root, dirs, files in os.walk(out_dir):
-        if any(f.endswith(".npz") for f in files):
-            npz_dir = root
-            break
-
-    if npz_dir is None:
-        raise RuntimeError(f"No .npz files found after extracting to {out_dir}")
-
-    print(f"NPZ files located at: {npz_dir}")
-    return npz_dir
-
-
-def build_split_lists(npz_dir: str, out_dir: str, val_frac: float = 0.05) -> None:
-    """
-    Build train / val / test split list files.
-
-    If the Zenodo deposit already provides split files, they are used as-is.
-    Otherwise a random 95/5 train/val split is created (no held-out test set).
-
-    Args:
-        npz_dir:  Directory containing .npz files.
-        out_dir:  Where to write the list files.
-        val_frac: Fraction of entries to hold out for validation.
-    """
-    import random
-
-    # Check for pre-existing split files
-    predefined = {}
-    for split in ("train", "val", "test"):
-        for fname in (f"{split}.lst", f"{split}.txt", f"{split}_ids.txt"):
-            candidate = os.path.join(out_dir, fname)
-            if os.path.isfile(candidate):
-                predefined[split] = candidate
+    # The zip extracts to rnagenesis_struct_pred_data/
+    data_root = os.path.join(out_dir, "rnagenesis_struct_pred_data")
+    if not os.path.isdir(data_root):
+        # Find wherever the npz files landed
+        for root, dirs, files in os.walk(out_dir):
+            if any(f.endswith(".npz") for f in files):
+                data_root = os.path.dirname(root)
                 break
 
-    if predefined:
-        print("Pre-existing split files detected:")
-        for split, path in predefined.items():
-            n = len(open(path).read().splitlines())
-            print(f"  {split}: {n} entries  ({path})")
-        return
+    print(f"Data root: {data_root}")
+    return data_root
 
-    # Build splits from available npz files
-    all_ids = sorted(f[:-4] for f in os.listdir(npz_dir) if f.endswith(".npz"))
-    random.shuffle(all_ids)
-    n_val = max(1, int(len(all_ids) * val_frac))
-    val_ids = all_ids[:n_val]
-    train_ids = all_ids[n_val:]
 
-    for split, ids in [("train", train_ids), ("val", val_ids)]:
-        path = os.path.join(out_dir, f"{split}.lst")
-        with open(path, "w") as fh:
-            fh.write("\n".join(ids) + "\n")
-        print(f"  {split}: {len(ids)} entries  →  {path}")
+# ---------------------------------------------------------------------------
+# Verify + summarise
+# ---------------------------------------------------------------------------
 
-    meta = {"total": len(all_ids), "train": len(train_ids), "val": len(val_ids)}
-    with open(os.path.join(out_dir, "dataset_meta.json"), "w") as fh:
+def verify(data_root: str) -> None:
+    """Print a summary of the extracted dataset."""
+    npz_dir = os.path.join(data_root, "train", "npz")
+    train_lst = os.path.join(data_root, "train", "train.lst")
+    val_lst = os.path.join(data_root, "train", "val.lst")
+
+    n_npz = len([f for f in os.listdir(npz_dir) if f.endswith(".npz")]) if os.path.isdir(npz_dir) else 0
+    n_train = len(open(train_lst).read().splitlines()) if os.path.isfile(train_lst) else 0
+    n_val = len(open(val_lst).read().splitlines()) if os.path.isfile(val_lst) else 0
+
+    test_sets = []
+    test_dir = os.path.join(data_root, "test")
+    if os.path.isdir(test_dir):
+        test_sets = [d for d in os.listdir(test_dir) if os.path.isdir(os.path.join(test_dir, d))]
+
+    print("\nDataset summary")
+    print("---------------")
+    print(f"  NPZ files (train+val) : {n_npz}")
+    print(f"  Train entries         : {n_train}")
+    print(f"  Val entries           : {n_val}")
+    print(f"  Test sets             : {', '.join(test_sets)}")
+    print(f"\nNPZ directory : {npz_dir}")
+    print(f"Train list    : {train_lst}")
+    print(f"Val list      : {val_lst}")
+
+    meta = {
+        "npz_dir": npz_dir,
+        "train_lst": train_lst,
+        "val_lst": val_lst,
+        "n_train": n_train,
+        "n_val": n_val,
+        "test_sets": test_sets,
+    }
+    meta_path = os.path.join(data_root, "dataset_meta.json")
+    with open(meta_path, "w") as fh:
         json.dump(meta, fh, indent=2)
+    print(f"Metadata      : {meta_path}")
 
 
 # ---------------------------------------------------------------------------
@@ -211,51 +161,47 @@ def build_split_lists(npz_dir: str, out_dir: str, val_frac: float = 0.05) -> Non
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Download and curate the RNA tertiary structure dataset from Zenodo."
+        description="Download and prepare the RNAGenesis structure prediction dataset."
     )
     parser.add_argument(
         "out_dir",
-        help="Root output directory (will be created if it does not exist).",
-    )
-    parser.add_argument(
-        "--force",
-        action="store_true",
-        help="Re-download the archive even if it already exists.",
-    )
-    parser.add_argument(
-        "--val_frac",
-        type=float,
-        default=0.05,
-        help="Fraction of entries to hold out for validation (default 0.05).",
+        help="Directory where the dataset will be downloaded and extracted.",
     )
     parser.add_argument(
         "--skip_download",
         action="store_true",
-        help="Skip download; assume archive already in out_dir.",
+        help="Skip download; assume the zip is already in out_dir.",
+    )
+    parser.add_argument(
+        "--keep_zip",
+        action="store_true",
+        help="Keep the zip archive after extraction (default: delete it).",
     )
     args = parser.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
 
-    if not args.skip_download:
-        archive = download_dataset(args.out_dir, force=args.force)
-    else:
-        archives = [
-            os.path.join(args.out_dir, f)
-            for f in os.listdir(args.out_dir)
-            if f.endswith(".zip")
-        ]
-        if not archives:
-            raise RuntimeError(f"No .zip archive found in {args.out_dir}")
-        archive = archives[0]
+    if args.skip_download:
+        # Look for an existing zip in out_dir
+        zips = [f for f in os.listdir(args.out_dir) if f.endswith(".zip")]
+        if not zips:
+            raise FileNotFoundError(
+                f"No zip file found in {args.out_dir}. "
+                f"Download manually from:\n  {GDRIVE_FOLDER_URL}"
+            )
+        archive = os.path.join(args.out_dir, zips[0])
         print(f"Using existing archive: {archive}")
+    else:
+        archive = _download_with_gdown(args.out_dir)
 
-    npz_dir = extract_and_curate(archive, args.out_dir)
-    build_split_lists(npz_dir, args.out_dir, val_frac=args.val_frac)
+    data_root = extract(archive, args.out_dir)
 
-    print("\nDataset ready.")
-    print(f"  NPZ dir : {npz_dir}")
-    print(f"  Lists   : {args.out_dir}/<train|val>.lst")
+    if not args.keep_zip:
+        os.remove(archive)
+        print(f"Removed archive: {archive}")
+
+    verify(data_root)
+    print("\nReady for training.")
 
 
 if __name__ == "__main__":

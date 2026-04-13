@@ -42,13 +42,23 @@ conda install -c https://levinthal:paradox@conda.rosettacommons.org -c conda-for
 
 ## Data Preparation
 
-Download the training dataset from Zenodo (DOI: [10.5281/zenodo.16754363](https://doi.org/10.5281/zenodo.16754363), ~3.7 GB):
+The curated dataset (~2.4 GB) is available on Google Drive:  
+**[https://drive.google.com/drive/folders/1R5lLvKCWWrAcLHVQjV8lT4hmkXJa1xhO](https://drive.google.com/drive/folders/1R5lLvKCWWrAcLHVQjV8lT4hmkXJa1xhO)**
+
+Download and extract automatically:
 
 ```bash
+pip install gdown
 python data/prepare_data.py /path/to/data
 ```
 
-This downloads the tertiary structure task archive, extracts NPZ files (each containing MSA, secondary structure, and inter-residue geometry labels), and writes `train.lst` / `val.lst` split files.
+Or download the zip manually from the link above, place it in your target directory, then run:
+
+```bash
+python data/prepare_data.py /path/to/data --skip_download
+```
+
+This extracts the NPZ files (each self-contained with MSA, secondary structure, and inter-residue geometry labels) alongside pre-built `train.lst` / `val.lst` split files.
 
 To convert your own PDB files into the NPZ format:
 
