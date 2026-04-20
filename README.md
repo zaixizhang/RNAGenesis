@@ -202,7 +202,7 @@ We thank the following open-source projects for their valuable contributions:
 - [RNAfold](https://github.com/ViennaRNA/ViennaRNA)
 - [RNApdbee 2.0](http://rnapdbee.cs.put.poznan.pl/)
 - [3DNADSSR](https://x3dna.org/)
-- [structRFM](https://github.com/luo-group/structRFM)
+- [structRFM](https://github.com/heqin-zhu/structRFM)
 - [AlphaFold3](https://github.com/google-deepmind/alphafold)
 
 ## 📄 License
