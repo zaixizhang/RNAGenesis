@@ -167,6 +167,22 @@ It takes around 5 hours to generate all the sequences on 1 A100 GPU.
 <img src="./asset/sequence_alignment.png" width="800"/>
 </div>
 
+## 🔧 Diffusion Model Training & Fine-tuning
+
+The latent diffusion model that powers sequence generation can be **fine-tuned** on a new corpus (e.g. a target RNA family, UTRs, aptamers, or your own sequences) or **trained from scratch** on a frozen auto-encoder. Both use the single script [`train_diffusion.py`](./train_diffusion.py), which reuses the same model code as `generation.py` and produces a diffusion checkpoint that plugs straight back into `generation.py` via `--dm_file`. A minimal fine-tuning run:
+
+```bash
+accelerate launch train_diffusion.py \
+    --train_data data/my_corpus/my_sequences.txt \
+    --output exps/my_finetune/diffusion-finetuned \
+    --encdec_checkpoint <PATH_TO_AUTOENCODER> \
+    --pretrained_ckpts <PATH_TO_DIFFUSION_CKPT> \
+    --data_type rna --num_epochs 1 --lr_warmup_steps 50
+```
+
+See [`FINETUNE.md`](./FINETUNE.md) for the full tutorial: data preparation, fine-tuning vs. training from scratch, all flags, and generating with the resulting model.
+
+
 ## 🔍 Encoder Checkpoint for Embeddings  
 
 We also release the **RNAGenesis encoder checkpoint** on [Hugging Face](https://huggingface.co/Zaixi/RNAGenesis), enabling direct extraction of **RNA embeddings** for downstream applications such as sequence classification, clustering, and functional annotation. This allows researchers to leverage RNAGenesis not only for generation but also as a **universal RNA representation model** that can be integrated into diverse pipelines.  
