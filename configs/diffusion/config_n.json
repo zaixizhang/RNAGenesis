@@ -1,0 +1,16 @@
+{
+  "activation_fn": "geglu",
+  "attention_bias": false,
+  "attention_head_dim": 128,
+  "cross_attention_dim": null,
+  "double_self_attention": false,
+  "dropout": 0.1,
+  "in_channels": 160,
+  "norm_elementwise_affine": true,
+  "num_attention_heads": 16,
+  "num_layers": 24,
+  "positional_embeddings": "sinusoidal",
+  "num_positional_embeddings": 1024, 
+  "num_embeds_ada_norm": 2000,
+  "norm_type": "ada_norm"
+}
