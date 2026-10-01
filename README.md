@@ -167,7 +167,7 @@ It takes around 5 hours to generate all the sequences on 1 A100 GPU.
 <img src="./asset/sequence_alignment.png" width="800"/>
 </div>
 
-## Sequence Encoder Pretraining
+## 🧠 RNAGenesis Encoder Pretraining
 
 Train the stage-one RNAGenesis encoder from scratch with masked RNA modeling:
 
@@ -184,7 +184,7 @@ of 512 sequences, and 500,000 optimizer updates. See [`PRETRAIN.md`](./PRETRAIN.
 for the architecture, multi-GPU launch, validation, checkpoint resume, and
 embedding extraction.
 
-## BEACON Prediction Fine-tuning
+## 🎯 Prediction Model Finetuning
 
 [`train_beacon_ncrna.py`](./train_beacon_ncrna.py) provides an end-to-end ncRNA
 classification example: load the stage-one encoder, add LoRA adapters, average
