@@ -26,41 +26,36 @@ There are two use cases, both handled by the single script `train_diffusion.py`:
 | **Fine-tune** an existing diffusion model on a new corpus (e.g. a target RNA family, UTRs, aptamers, your own sequences) | You have a released RNAGenesis diffusion checkpoint and want to adapt it | `--pretrained_ckpts <dm_file>` (+ usually `--lr_warmup_steps`, few `--num_epochs`) |
 | **Train from scratch** a new diffusion model on a frozen auto-encoder | You retrained / swapped the auto-encoder, or want a fresh model | `--model_config_name_or_path configs/diffusion/config_n.json` |
 
-> The fine-tuning workflow below is the one most reviewers / users will want: it
-> reuses the released checkpoints and only continues training on new data.
-
 ---
 
-## 0. Where the files go
+## 0. Repository layout
 
-This `finetune_tutorial/` folder mirrors the RNAGenesis repository layout. Copy
-its contents into the **repository root** (next to `generation.py`), merging into
-the existing `data/`, `configs/`, and `models/` folders:
+Run the commands below from the repository root, which contains the training
+entry point and its supporting modules:
 
-```
+```text
 RNAGenesis/
-├── generation.py                         # (already present) inference
-├── train_diffusion.py                    # <-- ADD: (pre-)training / fine-tuning
-├── util.py                               # (already present) must expose the cache vars (see §1)
-├── FINETUNE.md                           # <-- ADD: this tutorial
+├── generation.py                         # sequence generation
+├── train_diffusion.py                    # diffusion training and fine-tuning
+├── util.py                               # shared utilities and cache paths
+├── FINETUNE.md                           # diffusion training guide
 ├── data/
-│   ├── dataset_builder.py                # <-- ADD: builds the HF dataset from a .txt file
-│   └── fasta2txt.py                      # <-- ADD: FASTA -> one-sequence-per-line .txt
+│   ├── dataset_builder.py                # RNA corpus loading and tokenization
+│   └── fasta2txt.py                      # FASTA conversion and length filtering
 ├── configs/diffusion/
-│   └── config_n.json                     # <-- ADD: denoiser architecture (train-from-scratch only)
+│   └── config_n.json                     # denoiser architecture
 └── models/
-        ├── autoencoder/encdec.py             # (already present, used by generation.py)
-        └── diffusion_models/
-                ├── pipeline_ddim.py              # (already present, used by generation.py)
-                ├── transformer.py / util.py      # (already present) denoiser + model registry
-                └── config_ddim.json              # <-- ADD: DDIM noise scheduler config
+    ├── autoencoder/encdec.py             # sequence auto-encoder
+    └── diffusion_models/
+        ├── pipeline_ddim.py              # diffusion pipeline
+        ├── transformer.py                # Transformer denoiser
+        ├── util.py                       # model registry
+        └── config_ddim.json              # DDIM noise scheduler
 ```
 
-`train_diffusion.py` imports the **same modules `generation.py` already imports**
-(`models.autoencoder.encdec.EncDec`, `models.diffusion_models.pipeline_ddim`,
-`models.diffusion_models.util.get_model`), plus `data.dataset_builder` for the
-training set. Nothing in the model code changes — this only adds the training
-entry point.
+`train_diffusion.py` and `generation.py` share the `EncDec`, diffusion
+pipeline, and denoiser modules. Training data is loaded through
+`data.dataset_builder`.
 
 ---
 
@@ -74,14 +69,14 @@ entry point.
    `data/dataset_builder.py` read three module-level constants from `util.py`:
 
    ```python
-   ProGenPath     = "models/autoencoder/decoder/progen_configs"  # tokenizer location, keep as-is
-   DATA_CACHE_DIR = "/your/path/.cache/huggingface/datasets"     # <-- change to a writable dir
-   XDG_CACHE_HOME = "/your/path/.cache"                          # <-- change to a writable dir
+   ProGenPath     = "models/autoencoder/decoder/progen_configs"
+   DATA_CACHE_DIR = ".cache/data"
+   XDG_CACHE_HOME = ".cache"
    ```
 
-   Point the two `*_CACHE*` paths at a directory you can write to (the HuggingFace
-   `datasets` cache for the tokenized corpus). If your `util.py` does not define
-   `XDG_CACHE_HOME` / `DATA_CACHE_DIR` yet, add them.
+   These constants are already defined in `util.py`. The default cache paths
+   are relative to the repository root; change them if you need a different
+   writable location. `DATA_CACHE_DIR` stores the tokenized dataset cache.
 
 3. Configure `accelerate` once (single-GPU is fine):
 
@@ -107,8 +102,9 @@ AUGGCGAGCACCUUUGUGGCCAAGCUGAUCGAGAACGGCAAGUACAAGGUG
 ...
 ```
 
-If your sequences are in FASTA, convert them with the provided helper (it also
-filters by length and replaces `T`->`U`):
+If your sequences are in FASTA, place `my_sequences.fasta` in `data/my_corpus/`
+and run the helper below. It reads and writes files in `--folder`, filters by
+length, and replaces `T` with `U` when `--replace` is set:
 
 ```bash
 python data/fasta2txt.py \
@@ -140,8 +136,8 @@ auto-encoder frozen.
 accelerate launch train_diffusion.py \
         --train_data        data/my_corpus/my_sequences_min30max769.txt \
         --output            exps/my_finetune/diffusion-finetuned \
-        --encdec_checkpoint <PATH_TO_RELEASED_AUTOENCODER>   `# == generation.py --enc_dec_file` \
-        --pretrained_ckpts  <PATH_TO_RELEASED_DIFFUSION>     `# == generation.py --dm_file` \
+        --encdec_checkpoint /PATH/TO/RELEASED_AUTOENCODER \
+        --pretrained_ckpts  /PATH/TO/RELEASED_DIFFUSION \
         --data_type rna \
         --train_batch_size 64 \
         --gradient_accumulation_steps 4 \
@@ -166,16 +162,15 @@ What each important flag does:
 | `--save_all_epochs` | save a checkpoint per epoch under `output/epoch-{i}/` (otherwise only the final model is saved to `output/`). |
 | `--use_ema` | (optional) keep an exponential moving average of the weights; the released models were trained with EMA, and EMA state is reloaded from the pretrained ckpt if present. |
 
-**Reference recipe** (the UTR fine-tune used for the released models — fine-tune
-the ncRNA-pretrained diffusion model on a UTR corpus for 1 epoch with a 50-step
-warmup):
+**UTR fine-tuning example:** supply your UTR corpus and matching checkpoints.
+This command uses one epoch and a 50-step warmup:
 
 ```bash
 accelerate launch train_diffusion.py \
-        --train_data data/UTR/Fivespecies_...minNonemax769.txt \
-        --output     exps/.../diffusion/ae-2-dm-10-finetune-dm-1-1e-4-warm-up-50 \
-        --encdec_checkpoint exps/.../autoencoder/vocab-clean-epoch-2 \
-        --pretrained_ckpts  exps/.../diffusion/ae-2-dm-10 \
+        --train_data /PATH/TO/YOUR/UTR.txt \
+        --output     exps/my_utr/diffusion-finetuned \
+        --encdec_checkpoint /PATH/TO/RELEASED_AUTOENCODER \
+        --pretrained_ckpts  /PATH/TO/RELEASED_DIFFUSION \
         --data_type rna --train_batch_size 64 --gradient_accumulation_steps 4 \
         --num_epochs 1 --lr_warmup_steps 50
 ```
@@ -204,7 +199,7 @@ If you (re)trained the auto-encoder or want a brand-new denoiser, drop
 accelerate launch train_diffusion.py \
         --train_data data/my_corpus/my_sequences_min30max769.txt \
         --output     exps/my_run/diffusion-from-scratch \
-        --encdec_checkpoint <PATH_TO_AUTOENCODER> \
+        --encdec_checkpoint /PATH/TO/AUTOENCODER \
         --model_config_name_or_path configs/diffusion/config_n.json \
         --data_type rna \
         --train_batch_size 64 --gradient_accumulation_steps 4 \
@@ -225,7 +220,7 @@ unchanged from the inference README:
 
 ```bash
 python generation.py \
-        --enc_dec_file <PATH_TO_AUTOENCODER> \
+        --enc_dec_file /PATH/TO/AUTOENCODER \
         --dm_file      exps/my_finetune/diffusion-finetuned \
         --batch_size 128 --batch_num 10 \
         --eos_token "2" --do_sample --top_p 0.95 --top_k 0 --max_seq_len 960 \
@@ -254,18 +249,16 @@ using your fine-tuned `--dm_file`.
   forces deterministic kernels (slower, single-GPU debugging only).
 - **Logging**: defaults to Weights & Biases (`--logger wandb`); use
   `--logger tensorboard` for offline logs under `--output/logs`.
-- **Validation**: after training, you can quantify the held-out likelihood with
-  `test_nll.py` (NLL = ELBO of the diffusion model + VAE reconstruction NLL) if
-  you ship that evaluation script; otherwise inspect the training/val loss curves.
+- **Training metrics**: the script logs training loss, learning rate, and step
+  through the selected logger, plus EMA decay when `--use_ema` is enabled.
 
 ---
 
-## Provenance
+## Model integration
 
-`train_diffusion.py`, `data/dataset_builder.py`, `data/fasta2txt.py`,
-`configs/diffusion/config_n.json`, and `models/diffusion_models/config_ddim.json`
-implement the same latent-diffusion training procedure used to produce the
-released RNAGenesis checkpoints. They operate on the **existing** RNAGenesis model
-code (`models/autoencoder/encdec.py`, `models/diffusion_models/`) that
-`generation.py` already relies on — this tutorial only adds the training entry
-point and its data utilities, no changes to the model definitions.
+`train_diffusion.py` uses `data/dataset_builder.py` to load RNA sequences and
+the model classes in `models/autoencoder/` and `models/diffusion_models/`.
+The denoiser architecture and DDIM scheduler are configured by
+`configs/diffusion/config_n.json` and `models/diffusion_models/config_ddim.json`.
+Saved diffusion pipelines are selected for generation with
+`generation.py --dm_file`.

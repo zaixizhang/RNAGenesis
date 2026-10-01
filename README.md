@@ -64,14 +64,14 @@ mkdir -p checkpoints
 mkdir -p configs
 
 # Download model weights
-wget https://zenodo.org/records/15203813/files/checkpoints.zip?download=1
-wget https://zenodo.org/records/15203813/files/configs.zip?download=1
-wget https://zenodo.org/records/15203813/files/progen2-base.zip?download=1
-wget https://zenodo.org/records/15203813/files/progen2-small.zip?download=1
+wget -O checkpoints.zip "https://zenodo.org/records/15203813/files/checkpoints.zip?download=1"
+wget -O configs.zip "https://zenodo.org/records/15203813/files/configs.zip?download=1"
+wget -O progen2-base.zip "https://zenodo.org/records/15203813/files/progen2-base.zip?download=1"
+wget -O progen2-small.zip "https://zenodo.org/records/15203813/files/progen2-small.zip?download=1"
 
 # Extract model weights
 unzip checkpoints.zip -d checkpoints/
-unzip configs.zip -d confiigs/
+unzip configs.zip -d configs/
 unzip progen2-base.zip -d models/autoencoder/decoder/checkpoints/progen2-base/
 unzip progen2-small.zip -d models/autoencoder/decoder/checkpoints/progen2-small/
 
@@ -85,10 +85,10 @@ rm -f progen2-small.zip
 ## 📊 Inference Pipeline
 
 ### Inference Steps
-1. Generation with RNAGensis:
+1. Generation with RNAGenesis:
    ```bash
    # RNAGenesis
-   python generate.py \
+   python generation.py \
      --batch_size 128 \
      --batch_num 200 \
      --eos_token "2" \
@@ -97,7 +97,7 @@ rm -f progen2-small.zip
      --top_k 0 \
      --max_seq_len 37 \
      --enc_dec_file "configs/rnagenesis/autoencoder" \
-     --dm_file "checkpoints/Aptamer/diffusion" \  # for aptamer generation
+     --dm_file "checkpoints/Aptamer/diffusion" \
      --superfolder "generation_sequences" \
      --mid_folder "RNAGenesis_Aptamer"
    ```
@@ -112,7 +112,7 @@ rm -f progen2-small.zip
      --top_k 0 \
      --max_seq_len 64 \
      --enc_dec_file "configs/rnagenesis/autoencoder" \
-     --dm_file "checkpoints/sgRNA/diffusion" \  # for sgRNA generation
+     --dm_file "checkpoints/sgRNA/diffusion" \
      --superfolder "generation_sequences" \
      --mid_folder "RNAGenesis_sgRNA"
    ```
@@ -128,7 +128,7 @@ rm -f progen2-small.zip
       --top_k 0 \
       --max_seq_len 64 \
       --enc_dec_file "configs/rnagenesis/autoencoder" \
-      --dm_file "checkpoints/sgRNA/diffusion" \  # for sgRNA generation
+      --dm_file "checkpoints/sgRNA/diffusion" \
       --guidance \
       --target_class 0 \
       --guidance_classifier_model_config "configs/rangenesis/classifier/mlp_160_32.yaml" \
@@ -138,7 +138,7 @@ rm -f progen2-small.zip
       --superfolder "generation_sequences" \
       --mid_folder "Guid_sgRNA"
    ```
-3. Generation with Beam-Search RNAGensis:
+3. Generation with Beam-Search RNAGenesis:
    ```bash
    # tree search RNAGenesis
    python generation.py \
@@ -155,7 +155,7 @@ rm -f progen2-small.zip
      --top_k 0 \
      --max_seq_len 37 \
      --enc_dec_file "configs/rnagenesis/autoencoder" \
-     --dm_file "checkpoints/sgRNA/diffusion" \  # for sgRNA generation
+     --dm_file "checkpoints/sgRNA/diffusion" \
      --superfolder "generation_sequences" \
      --mid_folder "BS_sgRNA"
    ```
@@ -202,8 +202,8 @@ The latent diffusion model that powers sequence generation can be **fine-tuned**
 accelerate launch train_diffusion.py \
     --train_data data/my_corpus/my_sequences.txt \
     --output exps/my_finetune/diffusion-finetuned \
-    --encdec_checkpoint <PATH_TO_AUTOENCODER> \
-    --pretrained_ckpts <PATH_TO_DIFFUSION_CKPT> \
+    --encdec_checkpoint /PATH/TO/AUTOENCODER \
+    --pretrained_ckpts /PATH/TO/DIFFUSION_CKPT \
     --data_type rna --num_epochs 1 --lr_warmup_steps 50
 ```
 
