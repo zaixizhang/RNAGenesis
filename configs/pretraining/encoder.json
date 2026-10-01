@@ -1,0 +1,39 @@
+{
+  "model": {
+    "vocab_size": 20,
+    "hidden_size": 1280,
+    "num_layers": 32,
+    "num_heads": 20,
+    "intermediate_size": 3413,
+    "max_length": 1024,
+    "conv_kernel_sizes": [3, 5, 7, 9, 11, 13],
+    "hidden_dropout": 0.1,
+    "attention_dropout": 0.1,
+    "attention_backend": "auto"
+  },
+  "training": {
+    "global_batch_size": 512,
+    "micro_batch_size": 4,
+    "max_steps": 500000,
+    "warmup_steps": 10000,
+    "initial_lr": 0.00001,
+    "peak_lr": 0.0001,
+    "min_lr": 0.000001,
+    "weight_decay": 0.01,
+    "adam_betas": [0.9, 0.999],
+    "adam_eps": 1e-8,
+    "max_grad_norm": 1.0,
+    "precision": "bf16",
+    "gradient_checkpointing": true,
+    "mask_probability": 0.3,
+    "mask_replace_probability": 1.0,
+    "random_replace_probability": 0.0,
+    "seed": 42,
+    "num_workers": 4,
+    "log_every": 10,
+    "save_every": 5000,
+    "keep_last_checkpoints": 3,
+    "eval_every": 5000,
+    "eval_batches": 100
+  }
+}

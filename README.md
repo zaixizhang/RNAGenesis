@@ -167,6 +167,23 @@ It takes around 5 hours to generate all the sequences on 1 A100 GPU.
 <img src="./asset/sequence_alignment.png" width="800"/>
 </div>
 
+## Sequence Encoder Pretraining
+
+Train the stage-one RNAGenesis encoder from scratch with masked RNA modeling:
+
+```bash
+torchrun --standalone --nproc_per_node=16 train_encoder.py \
+    --config configs/pretraining/encoder.json \
+    --train_data /PATH/TO/YOUR/PREPARED_RNA.txt \
+    --output_dir /PATH/TO/YOUR/PRETRAIN_RUN
+```
+
+Supply your prepared RNA corpus as one uppercase sequence per line. The default
+configuration uses a 32-layer hybrid N-gram encoder, 30% masking, a global batch
+of 512 sequences, and 500,000 optimizer updates. See [`PRETRAIN.md`](./PRETRAIN.md)
+for the architecture, multi-GPU launch, validation, checkpoint resume, and
+embedding extraction.
+
 ## 🔧 Diffusion Model Training & Fine-tuning
 
 The latent diffusion model that powers sequence generation can be **fine-tuned** on a new corpus (e.g. a target RNA family, UTRs, aptamers, or your own sequences) or **trained from scratch** on a frozen auto-encoder. Both use the single script [`train_diffusion.py`](./train_diffusion.py), which reuses the same model code as `generation.py` and produces a diffusion checkpoint that plugs straight back into `generation.py` via `--dm_file`. A minimal fine-tuning run:
