@@ -184,6 +184,16 @@ of 512 sequences, and 500,000 optimizer updates. See [`PRETRAIN.md`](./PRETRAIN.
 for the architecture, multi-GPU launch, validation, checkpoint resume, and
 embedding extraction.
 
+## BEACON Prediction Fine-tuning
+
+[`train_beacon_ncrna.py`](./train_beacon_ncrna.py) provides an end-to-end ncRNA
+classification example: load the stage-one encoder, add LoRA adapters, average
+the valid nucleotide embeddings, and train an MLP prediction head for 13 classes.
+Supply your own data paths and run settings in
+[`configs/finetuning/beacon_ncrna.json`](./configs/finetuning/beacon_ncrna.json).
+See [`BEACON.md`](./BEACON.md) for training, checkpoint resume, evaluation, and
+unlabeled prediction.
+
 ## 🔧 Diffusion Model Training & Fine-tuning
 
 The latent diffusion model that powers sequence generation can be **fine-tuned** on a new corpus (e.g. a target RNA family, UTRs, aptamers, or your own sequences) or **trained from scratch** on a frozen auto-encoder. Both use the single script [`train_diffusion.py`](./train_diffusion.py), which reuses the same model code as `generation.py` and produces a diffusion checkpoint that plugs straight back into `generation.py` via `--dm_file`. A minimal fine-tuning run:

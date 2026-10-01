@@ -140,7 +140,8 @@ class RNAEncoderForMaskedLM(nn.Module):
                 with torch.no_grad():
                     module.weight[self.config.pad_token_id].zero_()
 
-    def forward(self, input_ids, attention_mask=None, labels=None):
+    def encode(self, input_ids, attention_mask=None):
+        """Return token embeddings without computing the pretraining MLM head."""
         if input_ids.ndim != 2 or input_ids.shape[1] > self.config.max_length:
             raise ValueError("Expected [batch, length] input within the configured context length")
         if attention_mask is None:
@@ -159,6 +160,10 @@ class RNAEncoderForMaskedLM(nn.Module):
             else:
                 x = layer(x, attention_mask)
         hidden = self.final_norm(x) * attention_mask.unsqueeze(-1)
+        return hidden
+
+    def forward(self, input_ids, attention_mask=None, labels=None):
+        hidden = self.encode(input_ids, attention_mask)
         logits = self.lm_head(hidden)
         result = {"last_hidden_state": hidden, "logits": logits}
         if labels is not None:

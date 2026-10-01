@@ -1,0 +1,43 @@
+{
+  "pretrained_encoder": "",
+  "data": {
+    "train": "",
+    "validation": "",
+    "test": ""
+  },
+  "output_dir": "",
+  "task": {
+    "name": "beacon_ncrna",
+    "num_classes": 13,
+    "readout": "mean",
+    "adaptation": "lora",
+    "head": {
+      "hidden_sizes": null,
+      "activation": null,
+      "dropout": null
+    },
+    "lora": {
+      "rank": null,
+      "alpha": null,
+      "dropout": null,
+      "targets": null
+    }
+  },
+  "training": {
+    "epochs": null,
+    "batch_size": null,
+    "learning_rate": null,
+    "weight_decay": null,
+    "optimizer": null,
+    "scheduler": null,
+    "warmup_ratio": null,
+    "adam_betas": [0.9, 0.999],
+    "adam_eps": 1e-8,
+    "max_grad_norm": 1.0,
+    "gradient_accumulation_steps": 1,
+    "gradient_checkpointing": true,
+    "precision": "fp32",
+    "num_workers": 0,
+    "seed": 42
+  }
+}
